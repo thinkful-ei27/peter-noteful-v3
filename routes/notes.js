@@ -4,7 +4,7 @@ const express = require('express');
 
 const router = express.Router();
 
-/* ========== GET/READ ALL ITEM ========== */
+/* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
 
   console.log('Get All Notes');
