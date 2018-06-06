@@ -1,11 +1,12 @@
 'use strict';
 
-const app = require('../server');
+// Clear the console before each run
+// process.stdout.write("\x1Bc\n");
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-// Clear the console before each run
-// process.stdout.write("\x1Bc\n");
+const app = require('../server');
 
 const expect = chai.expect;
 
@@ -52,7 +53,6 @@ describe('Basic Express setup', () => {
     it('should respond with 404 when given a bad path', () => {
       return chai.request(app)
         .get('/bad/path')
-        .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(404);
         });
