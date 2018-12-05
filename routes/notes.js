@@ -44,7 +44,7 @@ router.put('/:id', (req, res, next) => {
 router.delete('/:id', (req, res, next) => {
 
   console.log('Delete a Note');
-  res.status(204).end();
+  res.sendStatus(204);
 });
 
 module.exports = router;
