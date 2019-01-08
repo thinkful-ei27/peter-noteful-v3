@@ -79,15 +79,8 @@ mongoose.connect(MONGODB_URI, {useNewUrlParser: true})
   .then(() => {
 
     const searchId = {_id: '5c3510f623279e128f2a350b'};
-    const updatedNote = {
-      title: 'sdkfjhsdfkjhsdkjhsdkjfh',
-      content: 'It\'s 4:20 muthaFer'
-    };
 
-    return Note.findByIdAndUpdate(searchId, updatedNote, {
-      new: true,
-      upsert: true
-    });
+    return Note.findByIdAndRemove(searchId);
   })
   .then((results) => console.log(results))
   .then(() => mongoose.disconnect())
