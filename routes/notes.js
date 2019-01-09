@@ -54,10 +54,13 @@ router.post('/', (req, res, next) => {
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
-  const {id} = req.params;
-  console.log('Update a Note');
-  res.json({ id: 1, title: 'Updated Temp 1' });
+  const noteToUpdateId = req.params.id;
+  const updateNote = req.body;
 
+  Note
+    .findByIdAndUpdate(noteToUpdateId, updateNote)
+    .then(notes => res.json(notes))
+    .catch(err => next(err));
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
