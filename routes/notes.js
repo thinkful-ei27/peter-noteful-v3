@@ -6,31 +6,38 @@ const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-
-  
-  const searchTerm = req.query.title || req.query.content;
-  console.log(req.query);
-
+  const {searchTerm} = req.query;
+  let filter = {};
   let regex;
 
   if (searchTerm) {
     regex = new RegExp(searchTerm, 'i');
+    filter = {
+      $or: [
+        {}, 
+        {title: regex}, 
+        {content: regex}
+      ]
+    };
+    regex = new RegExp(searchTerm, 'i');
   }
 
-  Note.find({$or: [{}, {title: regex}, {content: regex}]}).sort({ updatedAt: 'desc' })
-    .then((results) => res.json(results))
-    .catch(err => {
-      console.error(`ERROR: ${err.message}`);
-      next(err);
-    });
+  Note
+    .find(filter)
+    .sort({ updatedAt: 'desc' })
+    .then(notes => res.json(notes))
+    .catch(err => next(err));
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
-
-  console.log('Get a Note');
-  res.json({ id: 1, title: 'Temp 1' });
-
+  const { id } = req.params;
+  
+  Note
+    .find({_id: id})
+    .sort({updatedAt: 'desc'})
+    .then(note => res.json(note))
+    .catch(err => next(err));
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
@@ -43,7 +50,7 @@ router.post('/', (req, res, next) => {
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
-
+  const {id} = req.params;
   console.log('Update a Note');
   res.json({ id: 1, title: 'Updated Temp 1' });
 

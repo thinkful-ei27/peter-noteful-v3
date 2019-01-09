@@ -16,7 +16,7 @@ mongoose.connect(MONGODB_URI,   {useNewUrlParser: true})
 
     return Note.find({$or: [{title: regex}, {content: regex}]}).sort({ updatedAt: 'desc' });
   })
-  .then((results) => console.log(JSON.stringify(results)))
+  .then((results) => console.log(JSON.stringify(results, null, 2)))
   .then(() => mongoose.disconnect())
   .catch(err => {
     console.error(`ERROR: ${err.message}`);
