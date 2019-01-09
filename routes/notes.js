@@ -65,9 +65,12 @@ router.put('/:id', (req, res, next) => {
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
+  const { idToBeDel } = req.params;
 
-  console.log('Delete a Note');
-  res.sendStatus(204);
+  Note
+    .findByIdAndRemove(idToBeDel)
+    .then(notes => res.sendStatus(204))
+    .catch(err => next(err));
 });
 
 module.exports = router;
