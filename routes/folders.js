@@ -5,7 +5,6 @@ const Folder = require('../models/folder');
 const mongoose = require('mongoose');
 const router = express.Router();
 
-
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
   const { searchTerm } = req.query;
@@ -23,6 +22,7 @@ router.get('/', (req, res, next) => {
     .then(folders => res.json(folders))
     .catch(err => next(err));
 });
+
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
   const { id } = req.params;
@@ -38,13 +38,14 @@ router.get('/:id', (req, res, next) => {
     .then(folder => res.json(folder))
     .catch(err => next(err));
 });
+
 /* ========== POST/ CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
   const newFolder = req.body;
 
   /* Validate user input */
   if (!newFolder.name) {
-    const err = new Error('The `name` field is missing');
+    const err = new Error('`name` field is missing');
     err.status = 400;
     return next(err);
   }
@@ -62,10 +63,41 @@ router.post('/', (req, res, next) => {
       next(err);
     });
 });
+
 /* ========== PUT/UPDATE AN ITEM ========== */
 router.put('/:id', (req, res, next) => {
+  const { id } = req.params;
+  const updateFolder = req.body;
 
+  /* Validate user input */
+  if (!updateFolder.name) {
+    const err = new Error('`name` field is missing'); 
+    err.status = 400;
+    return next(err);
+  }
+
+  /* Validate id for mongo */
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+
+  Folder
+    .findByIdAndUpdate(id, updateFolder)
+    .then(folders => res.json(folders))
+    .catch(err => {
+
+      // Check for `duplicate key error` code from Mongo
+      if(err.code === 11000) {
+        const err = new Error('The folder name already exists');
+        err.status = 400;
+        return next(err);
+      }
+      next(err);
+    });
 });
+
 /* ========== DELETE/ DELETE AN ITEM ========== */
 router.delete('/:id', (req, res, next) => {
 
