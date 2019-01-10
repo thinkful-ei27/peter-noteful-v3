@@ -42,16 +42,16 @@ app.use((err, req, res, next) => {
   }
 });
 
-// Connect to mongoose
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true})
-  .catch(err => {
-    console.error(`ERROR: ${err.message}`);
-    console.error('\n === Did you remember to start `mongod` ? === \n');
-    console.error(err);
-  });
 
-// Listen for incoming connections
+
 if (require.main === module) {
+  // Connect to mongoose
+  mongoose.connect(MONGODB_URI, { useNewUrlParser: true})
+    .catch(err => {
+      console.error(err);
+    });
+
+  // And Listen for incoming connections
   app.listen(PORT, function () {
     console.info(`Server listening on ${this.address().port}`);
   }).on('error', err => {
