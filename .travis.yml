@@ -8,4 +8,4 @@ deploy:
   app: peter-noteful-v3
   on:
     repo: thinkful-ei27/peter-noteful-v3
-    branch: feature/link-mongo
+    branch: master
