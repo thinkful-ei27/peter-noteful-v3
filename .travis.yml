@@ -1,3 +1,11 @@
 language: node_js
 node_js: node
 services: mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: TE25A+28jsIbpOgcU0QjQ7unno4qPfc5bBOXzJ5U4Dff/OIXoosCkhJbmB3GsWoG8ReKoSzlL15TG/XRIoUOMHK3NrxW5N9D6attlh1nCKkgMtlyEFAVFhXfuXW8M1l6PhsKg1j5MeDk1vS+xchQpYVLVrhYYDALS5k3SnwbRaAYdnr6hjc0W8Oy+ckFVBILCdUtpBSanLTKw+3dGNp/uRllds0/iHhtdW5fq30gc1dslg0NA8b/5OVUobCF7f6s9amFscTFoJWSFlkFloCXWwGxTGO7pKmyvhojM4rztmpE2VLvgXfOdLXu2lumg7oYO7eAU55LGSmZoovjz7GLHBP8E6g/Yjp+W/P+LpqWrx4c9Lf2MCgYQsJABsAj78cZKF0tEytzU1CpSOyMdLgSC/Vd6TspI73BqcVF4eBTcLlNFsSVxyMaoL3Eitz4Nh6cU3LkzRzSeR9IogAdTanZGuPsxZ5OfqDHrxqCgLXYt5TQ/BKqXShKV53rLGA+vSa7V3CPo0MGxPMWwGkuEyXm2mCC67RWciktP08tc2AmoqzrUNQtOZNU19nvfUl/7B7C6W2mxJbFRikK7dpJ5lr2dihA3A3yEFluk26ZxgnzvInTVGH4H9xkNSAu5RZPPwoBiQewiuMBOde5ADTMUG5eEQkaiXNXd50PCRMG9CX7QGE=
+  app: peter-noteful-v3
+  on:
+    repo: thinkful-ei27/peter-noteful-v3
+    branch: feature/link-mongo
