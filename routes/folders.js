@@ -8,7 +8,20 @@ const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
+  const { searchTerm } = req.query;
+  let filter = {};
+  let regex;
 
+  if (searchTerm) {
+    regex = new RegExp(searchTerm, 'i');
+    filter = { name: regex };
+  }
+
+  Folder
+    .find(filter)
+    .sort({name: 'asc'})
+    .then(folders => res.json(folders))
+    .catch(err => next(err));
 });
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {

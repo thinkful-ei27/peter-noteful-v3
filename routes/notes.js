@@ -19,7 +19,6 @@ router.get('/', (req, res, next) => {
         {content: regex}
       ]
     };
-    regex = new RegExp(searchTerm, 'i');
   }
 
   Note
