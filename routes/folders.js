@@ -40,7 +40,27 @@ router.get('/:id', (req, res, next) => {
 });
 /* ========== POST/ CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
-  
+  const newFolder = req.body;
+
+  /* Validate user input */
+  if (!newFolder.name) {
+    const err = new Error('The `name` field is missing');
+    err.status = 400;
+    return next(err);
+  }
+
+  Folder
+    .create(newFolder)
+    .then(note => res.location(`${req.originalUrl}/${note.id}`).status(201).json(note))
+    .catch(err => {
+      
+      // Check for `duplicate key error` code from Mongo
+      if (err.code === 11000) {
+        err = new Error('The folder name already exists');
+        err.status = 400;
+      }
+      next(err);
+    });
 });
 /* ========== PUT/UPDATE AN ITEM ========== */
 router.put('/:id', (req, res, next) => {

@@ -46,7 +46,7 @@ describe('Folders API resource', function () {
         .get('/api/folders')
         .then(function (_res) {
           res = _res;
-          expext(res).to.have.status(200)
+          expect(res).to.have.status(200);
           expect(res.body).to.be.a('array'); 
         });
     });
