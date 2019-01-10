@@ -69,7 +69,7 @@ describe('Notes API resouce', function () {
 
           res.body.forEach(function(note) {
             expect(note).to.be.a('object');
-            expect(note).to.include.keys('id', 'title', 'content', 'createdAt', 'updatedAt');
+            expect(note).to.include.keys('id', 'title', 'content', 'createdAt', 'updatedAt', 'folderId');
           });
 
           resNote = res.body[0];
@@ -104,7 +104,7 @@ describe('Notes API resouce', function () {
               expect(res).to.be.json;
 
               expect(resNote).to.be.an('object');
-              expect(resNote).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt');
+              expect(resNote).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt', 'folderId');
               // 3) then compare database results to API response
               expect(resNote.id).to.equal(note.id);
               expect(resNote.title).to.equal(note.title);
@@ -137,7 +137,7 @@ describe('Notes API resouce', function () {
           expect(res).to.have.header('location');
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.include.keys('id','title', 'content', 'createdAt', 'updatedAt');
+          expect(res.body).to.include.keys('id','title', 'content', 'createdAt', 'updatedAt', 'folderId');
 
           return Note.findById(res.body.id);
         })

@@ -43,9 +43,11 @@ describe('Folders API resource', function () {
       let res;
 
       return chai.request(app)
-        .then(function (folders) {
-          console.log(folders);
-          expect(folders).to.be.a('array'); 
+        .get('/api/folders')
+        .then(function (_res) {
+          res = _res;
+          expext(res).to.have.status(200)
+          expect(res.body).to.be.a('array'); 
         });
     });
   });
