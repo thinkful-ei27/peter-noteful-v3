@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const app = require('../server');
 
-const TEST_MONGOBD_URI = require('../config');
+const { TEST_MONGODB_URI } = require('../config');
 
 const Folder = require('../models/folder');
 
@@ -16,8 +16,8 @@ chai.use(chaiHttp);
 describe('Folders API resource', function () {
   // Connect to DB before all tests
   before(function () {
-    return mongoose.connect(TEST_MONGOBD_URI)
-      .then(() => mongoose.connect.db.dropDatabase());
+    return mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true})
+      .then(() => mongoose.connection.db.dropDatabase());
   });
 
   // Seed DB before each test
@@ -27,7 +27,7 @@ describe('Folders API resource', function () {
 
   // Drop DB after each test
   afterEach(function () {
-    return mongoose.connect.db.dropDatabase();
+    return mongoose.connection.db.dropDatabase();
   });
 
   // Disconnect from DB after all tests
@@ -37,6 +37,18 @@ describe('Folders API resource', function () {
 
 
   // ================ Tests for reading all folders
+  describe('GET all endpoint /api/folders', function () {
+
+    it('should get all of the folders', function () {
+      let res;
+
+      return chai.request(app)
+        .then(function (folders) {
+          console.log(folders);
+          expect(folders).to.be.a('array'); 
+        });
+    });
+  });
 
   // ================ Tests for reading single folder by id
 
