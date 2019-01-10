@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const folderSchema = new mongoose.Schema({
-  title: {
+  name: {
     type: String, 
     required: true,
     unique: true
