@@ -36,7 +36,7 @@ describe('Notes API resouce', function () {
     return mongoose.disconnect();
   });
 
-  // Test for Get All notes
+  // ================ Test for Get All notes
   describe('GET /api/notes', function () {
     let res;
 
@@ -84,6 +84,7 @@ describe('Notes API resouce', function () {
     });
   });
 
+  // ================ Test for get single note by id 
   describe('GET single note by id', function () {
 
     it('should get a single note from the collection', function () {
@@ -115,6 +116,7 @@ describe('Notes API resouce', function () {
     });
   });
   
+  // ================ Test for creating note
   describe('POST to /api/notes ', function () {
 
     it('should add a new note to the collection', function () {
@@ -149,6 +151,7 @@ describe('Notes API resouce', function () {
     });
   });
 
+  // ================ Test for updating single note
   describe('PUT update an item in the collection', function () {
 
     it('should update fields you send over', function() {
@@ -179,6 +182,7 @@ describe('Notes API resouce', function () {
     });
   });
 
+  // ================ Test for delete single note
   describe('DELETE endpoint', function() {
         
     it('should delete a note by id', function() {
