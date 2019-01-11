@@ -43,7 +43,7 @@ router.get('/:id', (req, res, next) => {
   }
   
   Note
-    .find({_id: id})
+    .findById(id)
     .sort({updatedAt: 'desc'})
     .then(note => {
       if (note) {

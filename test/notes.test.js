@@ -7,8 +7,9 @@ const app = require('../server');
 const { TEST_MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
+const Folder = require('../models/folder');
 
-const { notes } = require('../db/data');
+const { notes, folders } = require('../db/data');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -23,7 +24,10 @@ describe('Notes API resouce', function () {
 
   // Seed data runs before each test
   beforeEach(function () {
-    return Note.insertMany(notes);
+    return Promise.all([
+      Note.insertMany(notes),
+      Folder.insertMany(folders)
+    ]);
   });
 
   // Drop the databse after each test
@@ -93,27 +97,22 @@ describe('Notes API resouce', function () {
 
       return Note.findOne()
         .then(_note => {
-
           note = _note;
           return chai.request(app)
-            .get(`/api/notes/${note.id}`)
-            .then(res => {
-              //Why is res.body an array -- Classmates isn't
-              // *** ANSWER b/c I'm usuing find to query the DB in my routes instead of
-              // *** findById... find gives back an arr and findById just and obj  
-              const resNote = res.body[0];
-              expect(res).to.have.status(200);
-              expect(res).to.be.json;
+            .get(`/api/notes/${note.id}`);
+        })
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
 
-              expect(resNote).to.be.an('object');
-              expect(resNote).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt', 'folderId');
-              // 3) then compare database results to API response
-              expect(resNote.id).to.equal(note.id);
-              expect(resNote.title).to.equal(note.title);
-              expect(resNote.content).to.equal(note.content);
-              expect(new Date(resNote.createdAt)).to.eql(note.createdAt);
-              expect(new Date(resNote.updatedAt)).to.eql(note.updatedAt);
-            });
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt', 'folderId');
+          // 3) then compare database results to API response
+          expect(res.body.id).to.equal(note.id);
+          expect(res.body.title).to.equal(note.title);
+          expect(res.body.content).to.equal(note.content);
+          expect(new Date(res.body.createdAt)).to.eql(note.createdAt);
+          expect(new Date(res.body.updatedAt)).to.eql(note.updatedAt);
         });
     });
   });
