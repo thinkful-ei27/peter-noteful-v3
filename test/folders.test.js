@@ -96,26 +96,20 @@ describe('Folders API resource', function () {
       return Folder.findOne()
         .then(_data => {
           data = _data;
-
-          return chai.request(app)
-            .get(`/api/folders/${data.id}`)
-            .then(res => {
-              // Why is res.body an array -- Classmates isn't
-              // *** ANSWER b/c I'm usuing find to query the DB in my routes instead of
-              // *** findById... find gives back an arr and findById just and obj 
-              
-
-              expect(res).to.have.status(200);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body).to.have.keys('name', 'createdAt', 'updatedAt', 'id');
-              // compare the api response to the database results 
-              expect(res.body.id).to.equal(data.id);
-              expect(res.body.name).to.equal(data.name);
-              expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
-              expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
-            });
+          return chai.request(app).get(`/api/folders/${data.id}`);
+        })
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.keys('name', 'createdAt', 'updatedAt', 'id');
+          // compare the api response to the database results 
+          expect(res.body.id).to.equal(data.id);
+          expect(res.body.name).to.equal(data.name);
+          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
+          expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
         });
+        
     });
 
     it('should respond with a 400 for invalid id', function () {
