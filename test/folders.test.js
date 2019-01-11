@@ -194,7 +194,82 @@ describe('Folders API resource', function () {
 
   });
   // ================ Tests for updating a folder by id
+  describe('PUT endpoint updating folder', function () {
+    it('should update the folder', function () {
+      const updateFolder = {name: 'Updated This'};
+      let data;
+      return Folder.findOne()
+        .then((_data) => {
+          data = _data;
+          return chai.request(app).put(`/api/folders/${data.id}`).send(updateFolder);
+        })
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.all.keys('id', 'name', 'createdAt', 'updatedAt');
+          // compare api response to database response
+          expect(res.body.id).to.equal(data.id);
+          expect(res.body.name).to.equal(data.name);
+          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
+          expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
+        });
+    });
 
+    it('should return a 404 not found error when given an ID that does not exist', function () {
+      const updateFolder = {name: 'Updated This'};
+      return chai.request(app)
+        .put('/api/folders/DOESNOTEXIST')
+        .send(updateFolder)
+        .then(res => {
+          expect(res).to.have.status(404);
+        });
+    });
+
+    it('should return a 400 error when given an invalid ID', function () {
+      const updateFolder = {name: 'Updated This'};
+      return chai.request(app)
+        .put('/api/folders/NOT-A-VALID-ID')
+        .send(updateFolder)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.eq('The `id` is not valid');
+        });
+    });
+
+    it('should return a 400 error when `name` field is missing', function () {
+      const updateFolder = {foo: 'Updated This'};
+      let data;
+      return Folder.findOne()
+        .then(_data => {
+          data = _data;
+          return chai.request(app).put(`/api/folders/${data.id}`).send(updateFolder);
+        })
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.eq('The `id` is not valid');
+        });  
+    });
+
+    it('should return an error when given duplicate `name`', function () {
+      return Folder.find().limit(2)
+        .then(results => {
+          const [item1, item2] = results;
+          // set name of item1 to be name of item2
+          item1.name = item2.name;
+          return chai.request(app).put(`/api/folders/${item1.id}`).send(item1);
+        })
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.eq('The folder name already exists');
+        });  
+    });
+      
+  });
   // ================ Tests for Deleting a folder by id
 
 });

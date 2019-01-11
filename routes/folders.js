@@ -91,7 +91,13 @@ router.put('/:id', (req, res, next) => {
 
   Folder
     .findByIdAndUpdate(id, updateFolder)
-    .then(folders => res.json(folders))
+    .then(folders => {
+      if (folders) {
+        res.json(folders);
+      } else {
+        next();
+      }
+    })
     .catch(err => {
 
       // Check for `duplicate key error` code from Mongo
