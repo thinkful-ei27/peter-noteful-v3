@@ -226,8 +226,3 @@ describe('Notes API resouce', function () {
     });
   });
 });
-
-
-
-
-
