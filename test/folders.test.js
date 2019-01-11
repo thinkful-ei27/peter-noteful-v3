@@ -85,7 +85,7 @@ describe('Folders API resource', function () {
   });
 
   // ================ Tests for reading single folder by id
-  describe('GET folder by id', function () {
+  describe('GET endpoint w/ id', function () {
     
     it('should get a single folder by id', function () {
       let data;
@@ -133,7 +133,40 @@ describe('Folders API resource', function () {
     // });
   });
   // ================ Tests for creating a folder
+  describe('POST endpoint for createing folder', function () {
+    
+    it('should add a new folder to the collection', function () {
 
+      const newFolder = {
+        name: 'Newly Named Folder'
+      };
+
+      let res;
+
+      return chai.request(app)
+        .post('/api/folders')
+        .send(newFolder)
+        .then(_res => {
+
+          res = _res;
+
+          expect(res).to.have.status(201);
+          expect(res).to.have.header('location');
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.include.keys('name', 'createdAt', 'updatedAt', 'id');
+
+          return Folder.findById(res.body.id);
+        })
+        .then(folder => {
+          expect(res.body.id).to.equal(folder.id);
+          expect(res.body.name).to.equal(folder.name);
+          expect(new Date(res.body.createdAt)).to.eql(folder.createdAt);
+          expect(new Date(res.body.updatedAt)).to.eql(folder.updatedAt);
+        });
+    });
+
+  });
   // ================ Tests for updating a folder by id
 
   // ================ Tests for Deleting a folder by id
