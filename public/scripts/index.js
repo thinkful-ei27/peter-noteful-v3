@@ -19,5 +19,4 @@ $(document).ready(function () {
       store.tags = tags;
       noteful.render();
     });
-
 });

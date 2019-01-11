@@ -44,6 +44,7 @@ router.get('/:id', (req, res, next) => {
   
   Note
     .findById(id)
+    .populate('folderId')
     .sort({updatedAt: 'desc'})
     .then(note => {
       if (note) {
