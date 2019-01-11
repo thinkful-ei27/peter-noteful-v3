@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Tag = require('../models/tag');
-const Note = require('../models/note')
+const Note = require('../models/note');
 const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
