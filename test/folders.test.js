@@ -249,7 +249,7 @@ describe('Folders API resource', function () {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
-          expect(res.body.message).to.eq('The `id` is not valid');
+          expect(res.body.message).to.eq('`name` field is missing');
         });  
     });
 
@@ -270,6 +270,26 @@ describe('Folders API resource', function () {
     });
       
   });
-  // ================ Tests for Deleting a folder by id
 
+  // ================ Tests for Deleting a folder by id
+  describe('DELETE endpoint for folders', function () {
+
+    it('should delete an item by Id', function () {
+      let deleteFolderId;
+      return Folder.findOne()
+        .then((data) => {
+          deleteFolderId = data.id;
+          return chai.request(app)
+            .delete(`/api/folders/${deleteFolderId}`);
+        })
+        .then(res => {
+          expect(res).to.have.status(204);
+          return Folder.findById(deleteFolderId);
+        })
+        .then(_folder => {
+          expect(_folder).to.be.null;
+        });
+    });
+
+  });
 });
