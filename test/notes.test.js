@@ -98,7 +98,9 @@ describe('Notes API resouce', function () {
           return chai.request(app)
             .get(`/api/notes/${note.id}`)
             .then(res => {
-              //Why is res.body an array -- Classmates isn't 
+              //Why is res.body an array -- Classmates isn't
+              // *** ANSWER b/c I'm usuing find to query the DB in my routes instead of
+              // *** findById... find gives back an arr and findById just and obj  
               const resNote = res.body[0];
               expect(res).to.have.status(200);
               expect(res).to.be.json;

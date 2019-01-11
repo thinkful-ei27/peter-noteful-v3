@@ -41,7 +41,13 @@ router.get('/:id', (req, res, next) => {
   Note
     .find({_id: id})
     .sort({updatedAt: 'desc'})
-    .then(note => res.json(note))
+    .then(note => {
+      if (note) {
+        res.json(note);
+      } else {
+        next();
+      }
+    })
     .catch(err => next(err));
 });
 

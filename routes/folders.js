@@ -35,8 +35,14 @@ router.get('/:id', (req, res, next) => {
   }
 
   Folder
-    .find({_id: id})
-    .then(folder => res.json(folder))
+    .findById(id)
+    .then(folder => {
+      if (folder) {
+        res.json(folder);
+      } else {
+        next();
+      }
+    })
     .catch(err => next(err));
 });
 
@@ -55,7 +61,6 @@ router.post('/', (req, res, next) => {
     .create(newFolder)
     .then(note => res.location(`${req.originalUrl}/${note.id}`).status(201).json(note))
     .catch(err => {
-      
       // Check for `duplicate key error` code from Mongo
       if (err.code === 11000) {
         err = new Error('The folder name already exists');

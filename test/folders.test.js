@@ -22,7 +22,10 @@ describe('Folders API resource', function () {
 
   // Seed DB before each test
   beforeEach(function () {
-    return Folder.insertMany(folders);
+    return Folder.insertMany(folders)
+      .then(() => {
+        return Folder.createIndexes();
+      });
   });
 
   // Drop DB after each test
@@ -97,18 +100,20 @@ describe('Folders API resource', function () {
           return chai.request(app)
             .get(`/api/folders/${data.id}`)
             .then(res => {
-              //Why is res.body an array -- Classmates isn't 
-              const resFolder = res.body[0];
+              // Why is res.body an array -- Classmates isn't
+              // *** ANSWER b/c I'm usuing find to query the DB in my routes instead of
+              // *** findById... find gives back an arr and findById just and obj 
+              
 
               expect(res).to.have.status(200);
               expect(res).to.be.json;
-              expect(resFolder).to.be.an('object');
-              expect(resFolder).to.have.keys('name', 'createdAt', 'updatedAt', 'id');
+              expect(res.body).to.be.an('object');
+              expect(res.body).to.have.keys('name', 'createdAt', 'updatedAt', 'id');
               // compare the api response to the database results 
-              expect(resFolder.id).to.equal(data.id);
-              expect(resFolder.name).to.equal(data.name);
-              expect(new Date(resFolder.createdAt)).to.eql(data.createdAt);
-              expect(new Date(resFolder.updatedAt)).to.eql(data.updatedAt);
+              expect(res.body.id).to.equal(data.id);
+              expect(res.body.name).to.equal(data.name);
+              expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
+              expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
             });
         });
     });
@@ -122,15 +127,14 @@ describe('Folders API resource', function () {
         });
     });
 
-    // res is an empty array which is triggering a 200 WHY?
-    // it('should respond with a 404 not found for Id that does not exist', function() {
-    //   return chai.request(app)
-    //   // the str 'DOESNOTEXITS' is 12 bytes, which is a valod Mongo ObjectId
-    //     .get('/api/folders/DOESNOTEXIST')
-    //     .then(res => {
-    //       expect(res).to.have.status(404);
-    //     });
-    // });
+    it('should respond with a 404 not found for Id that does not exist', function() {
+      return chai.request(app)
+      // the str 'DOESNOTEXITS' is 12 bytes, which is a valid Mongo ObjectId
+        .get('/api/folders/DOESNOTEXIST')
+        .then(res => {
+          expect(res).to.have.status(404);
+        });
+    });
   });
   // ================ Tests for creating a folder
   describe('POST endpoint for createing folder', function () {
@@ -163,6 +167,34 @@ describe('Folders API resource', function () {
           expect(res.body.name).to.equal(folder.name);
           expect(new Date(res.body.createdAt)).to.eql(folder.createdAt);
           expect(new Date(res.body.updatedAt)).to.eql(folder.updatedAt);
+        });
+    });
+
+    it('should return an error when missing `name` field', function () {
+      const newItem = {foo: 'bar'};
+
+      return chai.request(app)
+        .post('/api/folders')
+        .send(newItem)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res).to.be.an('object');
+          expect(res.body.message).to.eq('`name` field is missing');
+        });
+    });
+
+    it('should return an error 400 when given a duplicate name', function () {
+      return Folder.findOne()
+        .then(data => {
+          const newItem = {name: data.name};
+          return chai.request(app).post('/api/folders').send(newItem);
+        })
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.eq('The folder name already exists');
         });
     });
 
