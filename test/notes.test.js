@@ -18,7 +18,7 @@ describe('Notes API resouce', function () {
 
   // Connect to the DB before all the tests
   before(function () {
-    return mongoose.connect(TEST_MONGODB_URI)
+    return mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true })
       .then(() => mongoose.connection.db.dropDatabase());
   });
 
@@ -27,7 +27,10 @@ describe('Notes API resouce', function () {
     return Promise.all([
       Note.insertMany(notes),
       Folder.insertMany(folders)
-    ]);
+    ])
+      .then(() => {
+        return Note.createIndexes();
+      });
   });
 
   // Drop the databse after each test
