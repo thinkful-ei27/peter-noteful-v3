@@ -190,7 +190,6 @@ describe('Notes API resouce', function () {
       
       return Note.findOne()
         .then(function(note) {
-          console.log(note);
           deleteNoteId = note.id;
           return chai.request(app)
             .delete(`/api/notes/${deleteNoteId}`);
@@ -200,7 +199,6 @@ describe('Notes API resouce', function () {
           return Note.findById(deleteNoteId);
         })
         .then(function(_note) {
-          console.log(_note);
           expect(_note).to.be.null;
         });
     });

@@ -47,8 +47,40 @@ describe('Folders API resource', function () {
         .then(function (_res) {
           res = _res;
           expect(res).to.have.status(200);
-          expect(res.body).to.be.a('array'); 
+          expect(res.body).to.have.lengthOf.at.least(1);
+          
+          return Folder.count();
+        })
+        .then(function (count) {
+          expect(res.body).to.have.lengthOf(count);
         });
+    });
+
+    it('should return folders with the right fields', function () {
+      // get back all folders and make sure theyh ave expected keys
+      let resFolder;
+
+      return chai.request(app)
+        .get('/api/folders')
+        .then(function (res) {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('array');
+          expect(res.body).to.have.lengthOf.at.least(1);
+
+          res.body.forEach(function (folder) {
+            expect(folder).to.be.a('object');
+            expect(folder).to.include.keys('id', 'name', 'updatedAt', 'createdAt');
+          });
+
+          resFolder = res.body[0];
+          return Folder.findById(resFolder.id);
+        })
+        .then(function(folder) {
+          expect(resFolder.id).to.equal(folder.id);
+          expect(resFolder.name).to.equal(folder.name);
+        });
+      
     });
   });
 
