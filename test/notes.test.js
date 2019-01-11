@@ -43,14 +43,14 @@ describe('Notes API resouce', function () {
     it('Should return all existing notes', function () {
       return chai.request(app)
         .get('/api/notes')
-        .then(function (_res) {
+        .then(_res => {
           res = _res;
           // console.log(res);
           expect(res).to.have.status(200);
           expect(res.body).to.have.lengthOf.at.least(1);
           return Note.count();
         })
-        .then(function (count) {
+        .then(count => {
           expect(res.body).to.have.lengthOf(count);
         });
     });
@@ -61,13 +61,13 @@ describe('Notes API resouce', function () {
       let resNote;
       return chai.request(app)
         .get('/api/notes')
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.a('array');
           expect(res.body).to.have.lengthOf.at.least(1);
 
-          res.body.forEach(function(note) {
+          res.body.forEach(note => {
             expect(note).to.be.a('object');
             expect(note).to.include.keys('id', 'title', 'content', 'createdAt', 'updatedAt', 'folderId');
           });
@@ -75,7 +75,7 @@ describe('Notes API resouce', function () {
           resNote = res.body[0];
           return Note.findById(resNote.id);
         })
-        .then(function(note) {
+        .then(note => {
 
           expect(resNote.id).to.equal(note.id);
           expect(resNote.title).to.equal(note.title);
@@ -92,12 +92,12 @@ describe('Notes API resouce', function () {
       let note;
 
       return Note.findOne()
-        .then(function(_note) {
+        .then(_note => {
 
           note = _note;
           return chai.request(app)
             .get(`/api/notes/${note.id}`)
-            .then(function (res) {
+            .then(res => {
               //Why is res.body an array -- Classmates isn't 
               const resNote = res.body[0];
               expect(res).to.have.status(200);
@@ -130,7 +130,7 @@ describe('Notes API resouce', function () {
       return chai.request(app)
         .post('/api/notes')
         .send(newNote)
-        .then(function (_res) {
+        .then(_res => {
 
           res = _res;
           expect(res).to.have.status(201);
@@ -141,7 +141,7 @@ describe('Notes API resouce', function () {
 
           return Note.findById(res.body.id);
         })
-        .then(function (note) {
+        .then(note => {
           expect(res.body.id).to.equal(note.id);
           expect(res.body.title).to.equal(note.title);
           expect(res.body.content).to.equal(note.content);
@@ -161,7 +161,7 @@ describe('Notes API resouce', function () {
       };
   
       return Note.findOne()
-        .then(function(note) {
+        .then(note => {
           updateData.id = note.id;
   
           // make request then inspect it to make sure it reflects
@@ -170,12 +170,12 @@ describe('Notes API resouce', function () {
             .put(`/api/notes/${note.id}`)
             .send(updateData);
         })
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
   
           return Note.findById(updateData.id);
         })
-        .then(function(note) {
+        .then(note => {
           expect(note.title).to.equal(updateData.title);
           expect(note.content).to.equal(updateData.content);
         });
@@ -189,16 +189,16 @@ describe('Notes API resouce', function () {
       let deleteNoteId;
       
       return Note.findOne()
-        .then(function(note) {
+        .then(note => {
           deleteNoteId = note.id;
           return chai.request(app)
             .delete(`/api/notes/${deleteNoteId}`);
         })
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(204);
           return Note.findById(deleteNoteId);
         })
-        .then(function(_note) {
+        .then(_note => {
           expect(_note).to.be.null;
         });
     });
