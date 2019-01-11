@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Tag = require('../models/tag');
+const Note = require('../models/note')
 const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
@@ -79,7 +80,7 @@ router.put('/:id', (req, res, next) => {
   }
 
   const updateTag = { name };
-  
+
   Tag
     .findByIdAndUpdate(id, updateTag, { new: true })
     .then(result => res.json(result))
@@ -94,7 +95,24 @@ router.put('/:id', (req, res, next) => {
 
 /* ========== DELETE SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
+  const { id } = req.params;
 
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+
+  const removeTagPromise = Tag.findByIdAndRemove(id);
+
+  const removeTagFromNotePromise = Note.updateMany(
+    { tags: id },
+    { $pull: { tags: id } }
+  );
+
+  Promise.all([removeTagPromise, removeTagFromNotePromise])
+    .then(() => res.sendStatus(204))
+    .catch(err => next(err));
 });
 
 module.exports = router;
