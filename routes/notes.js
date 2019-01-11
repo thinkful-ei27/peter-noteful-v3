@@ -7,7 +7,7 @@ const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  const {searchTerm} = req.query;
+  const { searchTerm, folderId } = req.query;
   let filter = {};
   let regex;
 
@@ -19,6 +19,10 @@ router.get('/', (req, res, next) => {
         {content: regex}
       ]
     };
+  }
+
+  if(folderId) {
+    filter.folderId = folderId;
   }
 
   Note
@@ -53,8 +57,22 @@ router.get('/:id', (req, res, next) => {
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
-  const newNote = req.body;
+  const { title, content , folderId } = req.body;
   
+  if (!title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
+    const err = new Error('The `folderId` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+
+  const newNote = { title, content , folderId };
+
   Note
     .create(newNote)
     .then(note => {
@@ -65,12 +83,37 @@ router.post('/', (req, res, next) => {
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
-  const noteToUpdateId = req.params.id;
-  const updateNote = req.body;
+  const { id } = req.params;
+  const { title, content, folderId } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error('The `id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+
+  if (!title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
+    const err = new Error('The `folderId` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+  const updateNote = { title, content, folderId };
 
   Note
-    .findByIdAndUpdate(noteToUpdateId, updateNote)
-    .then(notes => res.json(notes))
+    .findByIdAndUpdate(id, updateNote, {new: true})
+    .then(notes => {
+      if (notes) {
+        res.json(notes);
+      } else {
+        next();
+      }
+    })
     .catch(err => next(err));
 });
 
@@ -87,7 +130,7 @@ router.delete('/:id', (req, res, next) => {
 
   Note
     .findByIdAndRemove(id)
-    .then(notes => {
+    .then(() => {
       res.status(204).end();
     })
     .catch(err => next(err));
