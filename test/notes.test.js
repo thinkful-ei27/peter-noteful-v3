@@ -138,6 +138,24 @@ describe('Notes API resouce', function () {
           expect(new Date(res.body.updatedAt)).to.eql(note.updatedAt);
         });
     });
+
+    it('should return a 400 error when id is not valid', function () {
+      return chai.request(app)
+        .get('/api/notes/NOT-A-VALID-ID')
+        .then((res) => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.eq('The `id` is not valid');
+        });
+    });
+
+    it('should respond with a 404 not found for Id that does not exist', function() {
+      return chai.request(app)
+      // the str 'DOESNOTEXITS' is 12 bytes, which is a valid Mongo ObjectId
+        .get('/api/notes/DOESNOTEXIST')
+        .then(res => {
+          expect(res).to.have.status(404);
+        });
+    });
   });
   
   // ================ Test for creating note
@@ -148,8 +166,8 @@ describe('Notes API resouce', function () {
       const newNote = {
         title: 'BRAND NEW TITLE',
         content: 'SHINEY NEW CONTENT',
-        _id: '111111111111111111111109'
       };
+
       let res;
       return chai.request(app)
         .post('/api/notes')
@@ -171,6 +189,57 @@ describe('Notes API resouce', function () {
           expect(res.body.content).to.equal(note.content);
           expect(new Date(res.body.createdAt)).to.eql(note.createdAt);
           expect(new Date(res.body.updatedAt)).to.eql(note.updatedAt);
+        });
+    });
+
+    it('should return a 400 error for reqs w/ no title', function () {
+      const newItem = { 
+        foo: 'bar',
+        content: 'some content'
+      };
+
+      return chai.request(app)
+        .post('/api/notes')
+        .send(newItem)
+        .then((res) => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.eq('Missing `title` in request body');
+        });
+    });
+
+    it('should return a 400 err when given invalid folderId', function () {
+      const newItem = {
+        title: 'title',
+        content: 'some content',
+        folderId: 'NOT-A-VALID-ID'
+      };
+
+      return chai.request(app)
+        .post('/api/notes')
+        .send(newItem)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.an('object');
+          expect(res).to.be.json;
+          expect(res.body.message).to.eq('The `folderId` is not valid');
+        });
+    });
+
+    it('should return a 400 err when given invlaid tag ids', function () {
+      const newItem = {
+        title: 'some title',
+        content: 'some content',
+        tags: ['NOT-A-VALID-ID', '123']
+      };
+
+      return chai.request(app)
+        .post('/api/notes')
+        .send(newItem)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res).to.be.an('object');
+          expect(res.body.message).to.eq('The `id` is not valid');
         });
     });
   });
@@ -202,6 +271,98 @@ describe('Notes API resouce', function () {
         .then(note => {
           expect(note.title).to.equal(updateData.title);
           expect(note.content).to.equal(updateData.content);
+        });
+    });
+
+    it('should return a 400 error when id is not valid', function () {
+      const updateItem = {
+        title: 'a title',
+        content: 'so creative',
+      };
+
+      return chai.request(app)
+        .put('/api/notes/NOT-A-VALID-ID')
+        .send(updateItem)
+        .then((res) => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.eq('The `id` is not valid');
+        });
+    });
+
+    it('should return a 400 error when no title exists', function () {
+      const updateItem = {
+        title: '',
+        content: 'some content'
+      };
+
+      return Note.findOne()
+        .then(note => {
+          updateItem.id = note.id;
+
+          return chai.request(app)
+            .put(`/api/notes/${note.id}`)
+            .send(updateItem);
+        })
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.eq('Missing `title` in request body');
+        });
+    });
+
+    it('should return a 400 err when given invalid folderId', function () {
+      const updateItem = {
+        title: 'title',
+        content: 'some content',
+        folderId: 'NOT-A-VALID-ID'
+      };
+
+      return Note.findOne()
+        .then(note => {
+          return chai.request(app)
+            .put(`/api/notes/${note._id}`)
+            .send(updateItem);
+        })
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.an('object');
+          expect(res).to.be.json;
+          expect(res.body.message).to.eq('The `folderId` is not valid');
+        });
+    });
+
+    it('should return a 400 err when given invlaid tag ids', function () {
+      const updateItem = {
+        title: 'some title',
+        content: 'some content',
+        tags: ['NOT-A-VALID-ID', '123']
+      };
+
+      return Note.findOne()
+        .then(note => {
+          return chai.request(app)
+            .put(`/api/notes/${note._id}`)
+            .send(updateItem);
+        })
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res).to.be.an('object');
+          expect(res.body.message).to.eq('The `tags` array contains an invalid `id`');
+        });
+    });
+
+    it('should respond with a 404 not found for Id that does not exist', function() {
+      const updateItem = {
+        title: 'some title',
+        content: 'some content'
+      };
+
+      return chai.request(app)
+      // the str 'DOESNOTEXITS' is 12 bytes, which is a valid Mongo ObjectId
+        .put('/api/notes/DOESNOTEXIST')
+        .send(updateItem)
+        .then(res => {
+          expect(res).to.have.status(404);
         });
     });
   });
