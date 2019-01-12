@@ -87,7 +87,48 @@ describe('Tags API resource', function () {
   });
 
   // ================ Tests for reading single tag by id
+  describe('GET endpoint w/ id', function () {
+    
+    it('should get a single tag by id', function () {
+      let data;
 
+      return Tag.findOne()
+        .then(_data => {
+          data = _data;
+          return chai.request(app).get(`/api/tags/${data.id}`);
+        })
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.keys('name', 'createdAt', 'updatedAt', 'id');
+          // compare the api response to the database results 
+          expect(res.body.id).to.equal(data.id);
+          expect(res.body.name).to.equal(data.name);
+          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
+          expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
+        });
+        
+    });
+
+    it('should respond with a 400 for invalid id', function () {
+      return chai.request(app)
+        .get('/api/folders/NOT-A-VALID-ID')
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.eq('The `id` is not valid');
+        });
+    });
+
+    it('should respond with a 404 not found for Id that does not exist', function() {
+      return chai.request(app)
+      // the str 'DOESNOTEXITS' is 12 bytes, which is a valid Mongo ObjectId
+        .get('/api/folders/DOESNOTEXIST')
+        .then(res => {
+          expect(res).to.have.status(404);
+        });
+    });
+  });
 
   // ================ Tests for creating a tag
   describe('POST endpoint for createing tag', function () {
