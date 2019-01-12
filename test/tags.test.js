@@ -86,5 +86,31 @@ describe('Tags API resource', function () {
     });
   });
 
+  // ================ Tests for reading single tag by id
 
+  // ================ Tests for creating a tag
+
+  // ================ Tests for updating a tag by id
+
+  // ================ Tests for Deleting a tag by id
+  describe('DELETE endpoint for tags', function () {
+
+    it('should delete an item by Id', function () {
+      let deleteTagId;
+      return Tag.findOne()
+        .then((data) => {
+          deleteTagId = data.id;
+          return chai.request(app)
+            .delete(`/api/tags/${deleteTagId}`);
+        })
+        .then(res => {
+          expect(res).to.have.status(204);
+          return Tag.findById(deleteTagId);
+        })
+        .then(_tag => {
+          expect(_tag).to.be.null;
+        });
+    });
+
+  });
 });

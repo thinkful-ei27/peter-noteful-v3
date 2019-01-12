@@ -130,6 +130,7 @@ describe('Folders API resource', function () {
         });
     });
   });
+
   // ================ Tests for creating a folder
   describe('POST endpoint for createing folder', function () {
     
@@ -193,6 +194,7 @@ describe('Folders API resource', function () {
     });
 
   });
+  
   // ================ Tests for updating a folder by id
   describe('PUT endpoint updating folder', function () {
     it('should update the folder', function () {
