@@ -194,7 +194,7 @@ describe('Folders API resource', function () {
     });
 
   });
-  
+
   // ================ Tests for updating a folder by id
   describe('PUT endpoint updating folder', function () {
     it('should update the folder', function () {
@@ -212,9 +212,9 @@ describe('Folders API resource', function () {
           expect(res.body).to.have.all.keys('id', 'name', 'createdAt', 'updatedAt');
           // compare api response to database response
           expect(res.body.id).to.equal(data.id);
-          expect(res.body.name).to.equal(data.name);
+          expect(res.body.name).to.equal(updateFolder.name);
           expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
-          expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
+          expect(new Date(res.body.updatedAt)).to.greaterThan(data.updatedAt);
         });
     });
 

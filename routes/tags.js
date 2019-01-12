@@ -83,7 +83,13 @@ router.put('/:id', (req, res, next) => {
 
   Tag
     .findByIdAndUpdate(id, updateTag, { new: true })
-    .then(result => res.json(result))
+    .then(result => {
+      if (result) {
+        res.json(result);
+      } else {
+        next();
+      }
+    })
     .catch(err => {
       if (err.code === 11000) {
         err = new Error('Tag name already exists');

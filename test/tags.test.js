@@ -88,9 +88,87 @@ describe('Tags API resource', function () {
 
   // ================ Tests for reading single tag by id
 
+
   // ================ Tests for creating a tag
 
+
   // ================ Tests for updating a tag by id
+  describe('PUT endpoint updating tag', function () {
+
+    it('should update the tag', function () {
+      const updateTag = {name: 'Updated This'};
+      let data;
+      return Tag.findOne()
+        .then((_data) => {
+          data = _data;
+          return chai.request(app).put(`/api/tags/${data.id}`).send(updateTag);
+        })
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.all.keys('id', 'name', 'createdAt', 'updatedAt');
+          // compare api response to database response
+          expect(res.body.id).to.equal(data.id);
+          expect(res.body.name).to.equal(updateTag.name);
+          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
+          expect(new Date(res.body.updatedAt)).to.greaterThan(data.updatedAt);
+        });
+    });
+
+    it('should return a 404 not found error when given an ID that does not exist', function () {
+      const updateTag = {name: 'Updated This'};
+      return chai.request(app)
+        .put('/api/tags/DOESNOTEXIST')
+        .send(updateTag)
+        .then(res => {
+          expect(res).to.have.status(404);
+        });
+    });
+
+    it('should return a 400 error when given an invalid ID', function () {
+      const updateTag = {name: 'Updated This'};
+      return chai.request(app)
+        .put('/api/tags/NOT-A-VALID-ID')
+        .send(updateTag)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.eq('The `id` is not valid');
+        });
+    });
+
+    it('should return a 400 error when `name` field is missing', function () {
+      const updateTag = {foo: 'Updated This'};
+      let data;
+      return Tag.findOne()
+        .then(_data => {
+          data = _data;
+          return chai.request(app).put(`/api/tags/${data.id}`).send(updateTag);
+        })
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.eq('Missing `name` in request body');
+        });  
+    });
+
+    it('should return an error when given duplicate `name`', function () {
+      return Tag.find().limit(2)
+        .then(results => {
+          const [item1, item2] = results;
+          // set name of item1 to be name of item2
+          item1.name = item2.name;
+          return chai.request(app).put(`/api/tags/${item1.id}`).send(item1);
+        })
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.eq('Tag name already exists');
+        });  
+    });
+  });
 
   // ================ Tests for Deleting a tag by id
   describe('DELETE endpoint for tags', function () {
@@ -111,6 +189,5 @@ describe('Tags API resource', function () {
           expect(_tag).to.be.null;
         });
     });
-
   });
 });

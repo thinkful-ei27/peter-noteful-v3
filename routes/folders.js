@@ -90,7 +90,7 @@ router.put('/:id', (req, res, next) => {
   }
 
   Folder
-    .findByIdAndUpdate(id, updateFolder)
+    .findByIdAndUpdate(id, updateFolder, { new: true })
     .then(folders => {
       if (folders) {
         res.json(folders);
