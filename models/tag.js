@@ -8,9 +8,9 @@ const tagSchema = mongoose.Schema({
   }
 });
 
-mongoose.set('timestamps', true);
+tagSchema.set('timestamps', true);
 
-mongoose.set('toJSON', {
+tagSchema.set('toJSON', {
   virtuals: true,
   transform: (doc, ret) => {
     delete ret.__v;
