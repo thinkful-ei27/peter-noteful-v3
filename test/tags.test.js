@@ -90,7 +90,66 @@ describe('Tags API resource', function () {
 
 
   // ================ Tests for creating a tag
+  describe('POST endpoint for createing tag', function () {
+    
+    it('should add a new tag to the collection', function () {
 
+      const newTag = { name: 'Newly Named Tag' };
+
+      let res;
+
+      return chai.request(app)
+        .post('/api/tags')
+        .send(newTag)
+        .then(_res => {
+
+          res = _res;
+
+          expect(res).to.have.status(201);
+          expect(res).to.have.header('location');
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.include.keys('name', 'createdAt', 'updatedAt', 'id');
+
+          return Tag.findById(res.body.id);
+        })
+        .then(tag => {
+          expect(res.body.id).to.equal(tag.id);
+          expect(res.body.name).to.equal(tag.name);
+          expect(new Date(res.body.createdAt)).to.eql(tag.createdAt);
+          expect(new Date(res.body.updatedAt)).to.eql(tag.updatedAt);
+        });
+    });
+
+    it('should return an error when missing `name` field', function () {
+      const newItem = {foo: 'bar'};
+
+      return chai.request(app)
+        .post('/api/tags')
+        .send(newItem)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res).to.be.an('object');
+          expect(res.body.message).to.eq('Missing `name` in request body');
+        });
+    });
+
+    it('should return an error 400 when given a duplicate name', function () {
+      return Tag.findOne()
+        .then(data => {
+          const newItem = {name: data.name};
+          return chai.request(app).post('/api/tags').send(newItem);
+        })
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.eq('Tag name already exists');
+        });
+    });
+
+  });
 
   // ================ Tests for updating a tag by id
   describe('PUT endpoint updating tag', function () {
