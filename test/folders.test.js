@@ -293,5 +293,14 @@ describe('Folders API resource', function () {
         });
     });
 
+    it('should return a 400 error when given an invalid ID', function () {
+      return chai.request(app)
+        .delete('/api/folders/NOT-A-VALID-ID')
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.eq('The `id` is not valid');
+        });
+    });
+
   });
 });

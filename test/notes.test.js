@@ -226,5 +226,14 @@ describe('Notes API resouce', function () {
           expect(_note).to.be.null;
         });
     });
+
+    it('should return a 400 error when given an invalid ID', function () {
+      return chai.request(app)
+        .delete('/api/notes/NOT-A-VALID-ID')
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.eq('The `id` is not valid');
+        });
+    });
   });
 });
